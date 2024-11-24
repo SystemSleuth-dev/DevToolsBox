@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Unicode Tools - SystemSleuth</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(to right, #4a00e0, #8e2de2);
+      color: white;
+      text-align: center;
+    }
+
+    header {
+      padding: 30px;
+    }
+
+    header h1 {
+      font-size: 2.5em;
+      margin: 0;
+    }
+
+    main {
+      max-width: 800px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    .tool {
+      margin: 20px 0;
+      padding: 15px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+    }
+
+    .tool h2 {
+      margin-bottom: 10px;
+    }
+
+    .input-group {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin: 10px 0;
+    }
+
+    input[type="text"] {
+      padding: 10px;
+      border-radius: 5px;
+      border: 1px solid white;
+      background: rgba(0, 0, 0, 0.2);
+      color: white;
+      width: 60%;
+    }
+
+    button {
+      background: #4a00e0;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background: #8e2de2;
+    }
+
+    .output {
+      margin-top: 10px;
+      background: rgba(0, 0, 0, 0.2);
+      padding: 15px;
+      border-radius: 5px;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Unicode Tools - SystemSleuth</h1>
+</header>
+
+<main>
+  <!-- Convert Character to Code -->
+  <section class="tool">
+    <h2>Convert Character to Unicode Code</h2>
+    <div class="input-group">
+      <input type="text" id="char-to-code-input" placeholder="Enter a character (e.g., 😊)">
+      <button onclick="convertCharToCode()">Convert</button>
+    </div>
+    <div id="char-to-code-output" class="output"></div>
+  </section>
+
+  <!-- Convert Code to Character -->
+  <section class="tool">
+    <h2>Convert Unicode Code to Character</h2>
+    <div class="input-group">
+      <input type="text" id="code-to-char-input" placeholder="Enter a code (e.g., U+1F60A)">
+      <button onclick="convertCodeToChar()">Convert</button>
+    </div>
+    <div id="code-to-char-output" class="output"></div>
+  </section>
+</main>
+
+<footer>
+  <p>Made with ❤️ by <strong>SystemSleuth</strong></p>
+</footer>
+
+<script>
+  // Convert Character to Unicode Code (Handles Emoji and Multi-Character Unicode)
+  function convertCharToCode() {
+    const char = document.getElementById("char-to-code-input").value.trim();
+    if (char.length > 0) {
+      const codePoints = [...char].map(c => "U+" + c.codePointAt(0).toString(16).toUpperCase()).join(' ');
+      document.getElementById("char-to-code-output").textContent = 
+        `Unicode Code: ${codePoints}`;
+    } else {
+      document.getElementById("char-to-code-output").textContent = 
+        "Please enter a character.";
+    }
+  }
+
+  // Convert Unicode Code to Character
+  function convertCodeToChar() {
+    const code = document.getElementById("code-to-char-input").value.trim().toUpperCase();
+    const match = code.match(/^U\+([0-9A-F]{4,6})$/);
+    if (match) {
+      const char = String.fromCodePoint(parseInt(match[1], 16));
+      document.getElementById("code-to-char-output").textContent = 
+        `Character: ${char}`;
+    } else {
+      document.getElementById("code-to-char-output").textContent = 
+        "Please enter a valid Unicode code (e.g., U+1F60A).";
+    }
+  }
+</script>
+
+</body>
+</html>

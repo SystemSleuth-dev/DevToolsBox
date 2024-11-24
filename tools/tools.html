@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SystemSleuth DevToolsBox</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(to bottom right, #1e3c72, #2a5298);
+      color: #fff;
+    }
+
+    header {
+      text-align: center;
+      padding: 30px;
+      background: rgba(0, 0, 0, 0.3);
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 2.5em;
+    }
+
+    main {
+      padding: 20px;
+      max-width: 1000px;
+      margin: auto;
+    }
+
+    section {
+      margin-bottom: 40px;
+    }
+
+    section h2 {
+      text-align: center;
+      font-size: 1.8em;
+      margin-bottom: 10px;
+    }
+
+    .language-selector {
+      display: flex;
+      justify-content: space-around;
+      margin-bottom: 20px;
+    }
+
+    .language-box {
+      background-color: #2a5298;
+      color: white;
+      padding: 15px 30px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 18px;
+      transition: background 0.3s ease;
+      width: 30%;
+      text-align: center;
+    }
+
+    .language-box:hover {
+      background-color: #1e3c72;
+    }
+
+    textarea {
+      width: 100%;
+      height: 300px;
+      font-family: monospace;
+      padding: 15px;
+      border-radius: 5px;
+      border: 2px solid #fff;
+      background: #f9f9f9;
+      color: #333;
+      margin-top: 10px;
+    }
+
+    button {
+      background: #2a5298;
+      color: white;
+      border: none;
+      padding: 12px 25px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background 0.3s ease;
+      display: block;
+      margin: 10px auto;
+    }
+
+    button:hover {
+      background: #1e3c72;
+    }
+
+    .output {
+      width: 100%;
+      background: #333;
+      padding: 20px;
+      color: #f4f4f4;
+      font-family: monospace;
+      white-space: pre-wrap;
+      border-radius: 5px;
+      margin-top: 10px;
+    }
+
+    select {
+      padding: 8px;
+      font-size: 16px;
+      border-radius: 5px;
+      background-color: #f9f9f9;
+      border: 1px solid #ccc;
+      margin-bottom: 20px;
+      width: 120px;
+    }
+
+    footer {
+      text-align: center;
+      padding: 10px;
+      margin-top: 20px;
+      background: rgba(0, 0, 0, 0.2);
+    }
+
+    footer a {
+      color: #00c9ff;
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.14.9/beautify.min.js"></script>
+</head>
+<body>
+
+<header>
+  <h1>SystemSleuth DevToolsBox</h1>
+  <p>Validate and beautify JSON, YAML, HTML !</p>
+</header>
+
+<main>
+  <!-- Language Selector -->
+  <div class="language-selector">
+    <div class="language-box" id="json-select" onclick="selectLanguage('json')">JSON</div>
+    <div class="language-box" id="yaml-select" onclick="selectLanguage('yaml')">YAML</div>
+    <div class="language-box" id="html-select" onclick="selectLanguage('html')">HTML</div>
+  </div>
+
+  <!-- JSON Tool -->
+  <section id="json-tool">
+    <h2>JSON Validator & Beautifier</h2>
+    <div class="tool-container">
+      <select id="json-format" onchange="setJsonIndentation()">
+        <option value="2">2 Spaces</option>
+        <option value="3">3 Spaces</option>
+        <option value="4">4 Spaces</option>
+        <option value="1">Compact (1 Space)</option>
+      </select>
+      <textarea id="json-input" placeholder="Paste your JSON here..."></textarea>
+      <button onclick="processJSON()">Validate & Beautify JSON</button>
+      <div class="output" id="json-output"></div>
+    </div>
+  </section>
+
+  <!-- YAML Tool -->
+  <section id="yaml-tool" style="display: none;">
+    <h2>YAML Validator & Beautifier</h2>
+    <div class="tool-container">
+      <textarea id="yaml-input" placeholder="Paste your YAML here..."></textarea>
+      <button onclick="processYAML()">Validate & Beautify YAML</button>
+      <div class="output" id="yaml-output"></div>
+    </div>
+  </section>
+
+  <!-- HTML Beautifier -->
+  <section id="html-tool" style="display: none;">
+    <h2>HTML Beautifier</h2>
+    <div class="tool-container">
+      <textarea id="html-input" placeholder="Paste your HTML here..."></textarea>
+      <button onclick="beautifyHTML()">Beautify HTML</button>
+      <div class="output" id="html-output"></div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <p>Made with ❤️ by <a href="#">SystemSleuth</a></p>
+</footer>
+
+<script>
+  // Set default language to JSON
+  selectLanguage('json');
+
+  // Function to select the language
+  function selectLanguage(language) {
+    // Hide all sections
+    document.getElementById("json-tool").style.display = "none";
+    document.getElementById("yaml-tool").style.display = "none";
+    document.getElementById("html-tool").style.display = "none";
+    
+    // Reset outputs
+    document.getElementById("json-output").textContent = '';
+    document.getElementById("yaml-output").textContent = '';
+    document.getElementById("html-output").textContent = '';
+
+    // Show the selected language tool
+    if(language === 'json') {
+      document.getElementById("json-tool").style.display = "block";
+      document.getElementById("json-input").style.display = "block";
+    } else if(language === 'yaml') {
+      document.getElementById("yaml-tool").style.display = "block";
+    } else if(language === 'html') {
+      document.getElementById("html-tool").style.display = "block";
+    }
+  }
+
+  // JSON Beautifier
+  function processJSON() {
+    const input = document.getElementById("json-input").value;
+    const output = document.getElementById("json-output");
+    const indent = document.getElementById("json-format").value;
+    
+    try {
+      const parsedJSON = JSON.parse(input);
+      output.textContent = JSON.stringify(parsedJSON, null, parseInt(indent));
+      output.style.color = "#0f0";
+    } catch (error) {
+      output.textContent = `Error: ${error.message}`;
+      output.style.color = "#f00";
+    }
+  }
+
+  // YAML Beautifier
+  function processYAML() {
+    const input = document.getElementById("yaml-input").value;
+    const output = document.getElementById("yaml-output");
+
+    try {
+      const parsedYAML = jsyaml.load(input);
+      const beautifiedYAML = jsyaml.dump(parsedYAML, { indent: 2 });
+      output.textContent = beautifiedYAML;
+      output.style.color = "#0f0";
+    } catch (error) {
+      output.textContent = `Error: ${error.message}`;
+      output.style.color = "#f00";
+    }
+  }
+
+  // HTML Beautifier
+  function beautifyHTML() {
+    const input = document.getElementById("html-input").value;
+    const output = document.getElementById("html-output");
+    const beautifiedHTML = html_beautify(input, { indent_size: 2 });
+
+    if (beautifiedHTML.trim() === "") {
+      output.textContent = "No valid HTML content.";
+      output.style.color = "#f00";
+    } else {
+      output.textContent = beautifiedHTML;
+      output.style.color = "#0f0";
+    }
+  }
+</script>
+
+</body>
+</html>
